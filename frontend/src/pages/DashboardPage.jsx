@@ -322,18 +322,7 @@ export default function DashboardPage() {
 
         {/* ══ HERO ══════════════════════════════════════════════════════════════ */}
         <section className="pt-16 pb-12 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.05, type: "spring", stiffness: 260, damping: 22 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full mb-7"
-            style={{ background: "rgba(255,34,34,0.09)", border: "1px solid rgba(255,34,34,0.22)" }}
-          >
-            <span className="live-dot" />
-            <span style={{ fontSize: 12, color: "#ff7070", fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "0.04em" }}>
-              REAL-TIME YOUTUBE WATCH PARTY
-            </span>
-          </motion.div>
+
 
           <motion.h1
             initial={{ opacity: 0, y: 28 }}
@@ -488,65 +477,6 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* ══ ROLE TABLE ════════════════════════════════════════════════════════ */}
-        <section className="mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-10"
-          >
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.6rem,3vw,2.2rem)", fontWeight: 700, color: "var(--text-1)", marginBottom: 8 }}>
-              Role-based access
-            </h2>
-            <p style={{ fontSize: 14, color: "var(--text-3)" }}>The host controls who can do what</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="overflow-x-auto rounded-2xl"
-            style={{ border: "1px solid var(--border-1)" }}
-          >
-            <table className="w-full text-sm min-w-[500px]">
-              <thead>
-                <tr style={{ background: "rgba(255,255,255,0.03)", borderBottom: "1px solid var(--border-2)" }}>
-                  {["Role", "Play / Pause", "Seek", "Change Video", "Assign Roles", "Remove Users"].map((h) => (
-                    <th key={h} className="px-4 py-3.5 text-left" style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {ROLE_MATRIX.map((row, ri) => (
-                  <tr
-                    key={row.role}
-                    style={{ borderBottom: ri < ROLE_MATRIX.length - 1 ? "1px solid var(--border-2)" : "none" }}
-                    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
-                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                  >
-                    <td className="px-4 py-3.5">
-                      <span
-                        className="text-xs px-3 py-1 rounded-full font-semibold"
-                        style={{ color: row.color, background: row.bg, border: `1px solid ${row.border}`, fontFamily: "var(--font-display)" }}
-                      >
-                        {row.role}
-                      </span>
-                    </td>
-                    {row.checks.map((ok, ci) => (
-                      <td key={ci} className="px-4 py-3.5 text-center">
-                        {ok
-                          ? <FiCheck style={{ color: "#22c55e", margin: "0 auto", fontSize: 15 }} />
-                          : <span style={{ color: "var(--text-4)" }}>—</span>}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </motion.div>
-        </section>
 
         {/* ══ MY ROOMS ══════════════════════════════════════════════════════════ */}
         <section className="mb-20">

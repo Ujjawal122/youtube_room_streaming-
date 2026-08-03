@@ -203,14 +203,11 @@ export default function RoomPage() {
       <div className="flex-1 flex overflow-hidden">
 
         {/* Left: video + controls */}
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0 p-3 sm:p-4 gap-3">
+        <div className="flex-1 flex flex-col overflow-y-auto min-w-0 p-3 sm:p-4 gap-3">
           {/* Player — grows to fill remaining space, maintains 16/9 */}
-          <div className="relative flex-1 min-h-0 flex items-center">
-            <div className="w-full relative">
-              {/* 16:9 aspect-ratio box */}
-              <div
-                style={{ position: "relative", width: "100%", paddingBottom: "56.25%" }}
-              >
+          <div className="relative flex-1 min-h-[200px] flex items-center justify-center">
+            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ aspectRatio: "16 / 9", width: "100%", maxHeight: "100%", position: "relative" }}>
                 <div style={{ position: "absolute", inset: 0 }}>
                   <YouTubePlayer
                     videoId={videoState.videoId}

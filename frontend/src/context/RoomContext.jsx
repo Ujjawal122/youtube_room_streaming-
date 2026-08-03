@@ -77,7 +77,10 @@ export const RoomProvider = ({ children }) => {
             if (newHostId === user?._id) setMyRole("host");
         };
 
-        const onNewChatMessage = (msg) => setMessages((prev) => [...prev, msg]);
+        const onNewChatMessage = (msg) => setMessages((prev) => {
+            if (prev.some(m => m._id === msg._id)) return prev;
+            return [...prev, msg];
+        });
 
         const onNewReaction = (reaction) => {
             const id = Date.now();
@@ -155,8 +158,13 @@ export const RoomProvider = ({ children }) => {
     const emitReaction = useCallback((emoji) =>
         socket.emit("send_reaction", { roomId: room?.roomId, emoji }), [socket, room]);
 
-    const prependMessages = useCallback((msgs) =>
-        setMessages((prev) => [...msgs, ...prev]), []);
+    const prependMessages = useCallback((msgs) => {
+        setMessages((prev) => {
+            const existingIds = new Set(prev.map(m => m._id));
+            const newMsgs = msgs.filter(m => !existingIds.has(m._id));
+            return [...newMsgs, ...prev];
+        });
+    }, []);
 
     return (
         <RoomContext.Provider value={{
