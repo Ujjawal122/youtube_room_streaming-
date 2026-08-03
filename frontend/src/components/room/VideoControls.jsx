@@ -12,7 +12,6 @@ const extractVideoId = (input) => {
   return match ? match[1] : trimmed.length === 11 ? trimmed : "";
 };
 
-// Ripple hook
 function useRipple() {
   const [ripples, setRipples] = useState([]);
   const trigger = useCallback((e) => {
@@ -25,6 +24,36 @@ function useRipple() {
     setTimeout(() => setRipples((r) => r.filter((ri) => ri.id !== id)), 600);
   }, []);
   return { ripples, trigger };
+}
+
+function RequestControlButton() {
+  const { emitRequestControl } = useRoom();
+  const [requested, setRequested] = useState(false);
+
+  const handleRequest = () => {
+    emitRequestControl();
+    setRequested(true);
+    // Optionally reset state after a while, or keep it true until role updates
+    setTimeout(() => setRequested(false), 30000); 
+  };
+
+  return (
+    <motion.button
+      onClick={handleRequest}
+      disabled={requested}
+      className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0"
+      style={{
+        background: requested ? "rgba(255,255,255,0.05)" : "rgba(155,89,245,0.15)",
+        border: `1px solid ${requested ? "rgba(255,255,255,0.1)" : "rgba(155,89,245,0.3)"}`,
+        color: requested ? "var(--text-4)" : "#b98ff5",
+        fontFamily: "var(--font-display)",
+      }}
+      whileHover={requested ? {} : { scale: 1.05 }}
+      whileTap={requested ? {} : { scale: 0.95 }}
+    >
+      {requested ? "Access Requested..." : "Request Access"}
+    </motion.button>
+  );
 }
 
 export default function VideoControls({ canControl }) {
@@ -315,17 +344,20 @@ export default function VideoControls({ canControl }) {
         )}
       </AnimatePresence>
 
-      {/* Viewer hint */}
+      {/* Viewer hint / Request Control */}
       {!canControl && (
-        <p
-          className="flex items-center gap-2 text-xs"
-          style={{ color: "var(--text-4)", fontFamily: "var(--font-body)" }}
-        >
-          <span
-            style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "inline-block", flexShrink: 0 }}
-          />
-          Only the host or moderator can control playback
-        </p>
+        <div className="flex items-center justify-between gap-4 mt-2" style={{ borderTop: "1px solid var(--border-2)", paddingTop: 12 }}>
+          <p
+            className="flex items-center gap-2 text-xs m-0"
+            style={{ color: "var(--text-4)", fontFamily: "var(--font-body)" }}
+          >
+            <span
+              style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "inline-block", flexShrink: 0 }}
+            />
+            Only the host or moderator can control playback
+          </p>
+          <RequestControlButton />
+        </div>
       )}
     </div>
   );

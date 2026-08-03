@@ -43,6 +43,7 @@ export class MessageHandler {
         s.on("transfer_host", (data) => this._onTransferHost(data));
         s.on("send_chat", (data) => this._onSendChat(data));
         s.on("send_reaction", (data) => this._onSendReaction(data));
+        s.on("request_control", (data) => this._onRequestControl(data));
         s.on("disconnect", () => this._onDisconnect());
     }
 
@@ -424,6 +425,25 @@ export class MessageHandler {
             });
         } catch (err) {
             this._error("Failed to send reaction");
+        }
+    }
+
+    // ── request_control ───────────────────────────────────────────────────────────
+
+    async _onRequestControl({ roomId }) {
+        try {
+            const mgr = this._getRoom(roomId); if (!mgr) return this._error("Room not found");
+            const self = this._getSelfParticipant(mgr); if (!self) return;
+
+            if (self.canControl()) return; // Already has control
+
+            // Notify everyone (frontend handles only host seeing it)
+            mgr.broadcast("control_requested", {
+                userId: this._userId(),
+                username: this._username(),
+            });
+        } catch (err) {
+            this._error("Failed to request control");
         }
     }
 

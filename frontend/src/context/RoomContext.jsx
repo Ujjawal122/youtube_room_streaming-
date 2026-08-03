@@ -17,6 +17,7 @@ export const RoomProvider = ({ children }) => {
     });
     const [messages, setMessages] = useState([]);
     const [reactions, setReactions] = useState([]);
+    const [controlRequests, setControlRequests] = useState([]);
 
     // ── Sync guard ──────────────────────────────────────────────────────────────
     // Set to true while we're applying a remote sync_state so the player
@@ -88,6 +89,14 @@ export const RoomProvider = ({ children }) => {
             setTimeout(() => setReactions((prev) => prev.filter((r) => r.id !== id)), 3000);
         };
 
+        const onControlRequested = (req) => {
+            // Only host needs to track requests
+            setControlRequests((prev) => {
+                if (prev.some(r => r.userId === req.userId)) return prev;
+                return [...prev, req];
+            });
+        };
+
         socket.on("room_state", onRoomState);
         socket.on("sync_state", onSyncState);
         socket.on("user_joined", onUserJoined);
@@ -97,6 +106,7 @@ export const RoomProvider = ({ children }) => {
         socket.on("participant_removed", onParticipantRemoved);
         socket.on("new_chat_message", onNewChatMessage);
         socket.on("new_reaction", onNewReaction);
+        socket.on("control_requested", onControlRequested);
 
         return () => {
             socket.off("room_state", onRoomState);
@@ -108,6 +118,7 @@ export const RoomProvider = ({ children }) => {
             socket.off("participant_removed", onParticipantRemoved);
             socket.off("new_chat_message", onNewChatMessage);
             socket.off("new_reaction", onNewReaction);
+            socket.off("control_requested", onControlRequested);
         };
     }, [socket, user]);
 
@@ -121,6 +132,7 @@ export const RoomProvider = ({ children }) => {
             setRoom(null);
             setMessages([]);
             setParticipants([]);
+            setControlRequests([]);
         }
     }, [socket, room]);
 
@@ -158,6 +170,12 @@ export const RoomProvider = ({ children }) => {
     const emitReaction = useCallback((emoji) =>
         socket.emit("send_reaction", { roomId: room?.roomId, emoji }), [socket, room]);
 
+    const emitRequestControl = useCallback(() =>
+        socket.emit("request_control", { roomId: room?.roomId }), [socket, room]);
+
+    const removeControlRequest = useCallback((userId) =>
+        setControlRequests((prev) => prev.filter((r) => r.userId !== userId)), []);
+
     const prependMessages = useCallback((msgs) => {
         setMessages((prev) => {
             const existingIds = new Set(prev.map(m => m._id));
@@ -168,13 +186,13 @@ export const RoomProvider = ({ children }) => {
 
     return (
         <RoomContext.Provider value={{
-            room, participants, myRole, videoState, messages, reactions,
+            room, participants, myRole, videoState, messages, reactions, controlRequests,
             applyingRemote,
             joinRoom, leaveRoom,
             emitPlay, emitPause, emitSeek, emitChangeVideo,
             emitAssignRole, emitRemove, emitTransferHost,
-            emitSendChat, emitReaction,
-            prependMessages,
+            emitSendChat, emitReaction, emitRequestControl,
+            removeControlRequest, prependMessages,
         }}>
             {children}
         </RoomContext.Provider>

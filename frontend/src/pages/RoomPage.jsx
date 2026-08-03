@@ -30,7 +30,10 @@ export default function RoomPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const { user } = useAuth();
-  const { room, myRole, videoState, joinRoom, leaveRoom, emitPlay, emitPause, emitSeek } = useRoom();
+  const { 
+    room, myRole, videoState, joinRoom, leaveRoom, emitPlay, emitPause, emitSeek,
+    controlRequests, emitAssignRole, removeControlRequest
+  } = useRoom();
 
   const [sidePanel, setSidePanel] = useState("chat");
   const [copied, setCopied] = useState(false);
@@ -222,6 +225,47 @@ export default function RoomPage() {
               </div>
             </div>
             <ReactionOverlay />
+            
+            {/* Control Requests Banner for Host */}
+            {myRole === "host" && controlRequests?.length > 0 && (
+              <div className="absolute top-4 left-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+                <AnimatePresence>
+                  {controlRequests.map((req) => (
+                    <motion.div
+                      key={req.userId}
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="px-4 py-3 rounded-xl flex items-center justify-between shadow-2xl backdrop-blur-xl pointer-events-auto mx-auto w-full max-w-lg"
+                      style={{ background: "rgba(15,15,15,0.85)", border: "1px solid rgba(155,89,245,0.4)" }}
+                    >
+                      <span className="text-sm font-medium" style={{ color: "var(--text-1)", fontFamily: "var(--font-display)" }}>
+                        <span style={{ color: "#b98ff5", fontWeight: 700 }}>{req.username}</span> requested player access
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => removeControlRequest(req.userId)}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:bg-white/10"
+                          style={{ color: "var(--text-3)", background: "rgba(255,255,255,0.05)" }}
+                        >
+                          Deny
+                        </button>
+                        <button
+                          onClick={() => {
+                            emitAssignRole(req.userId, "moderator");
+                            removeControlRequest(req.userId);
+                          }}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105"
+                          style={{ background: "#9b59f5", color: "#fff", boxShadow: "0 2px 10px rgba(155,89,245,0.3)" }}
+                        >
+                          Approve
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
 
           {/* Controls */}
