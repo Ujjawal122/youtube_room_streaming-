@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: watchparty-backend
+    env: node
+    # Points Render to the backend directory
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/server.js
+    
+    # Environment variables that Render will use
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      
+      # The following variables are marked as "sync: false", meaning you will 
+      # need to enter them manually in the Render dashboard after connecting 
+      # this yaml file, so your secrets aren't exposed in source control.
+      - key: MONGO_DB
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CLIENT_URL
+        sync: false
