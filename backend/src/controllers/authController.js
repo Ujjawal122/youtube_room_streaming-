@@ -2,14 +2,14 @@ import bcrypt from "bcryptjs";
 import User from "../models/userModel.js";
 import { generateToken } from "../lib/jwt.js";
 
-// ── Cookie config ─────────────────────────────────────────────────────────────
+
 const COOKIE_NAME = "watchparty_token";
 
 const cookieOptions = {
-    httpOnly: true,                               // JS cannot read it — XSS safe
-    secure: process.env.NODE_ENV === "production",// HTTPS only in prod
+    httpOnly: true,                               
+    secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,             // 7 days in ms
+    maxAge: 7 * 24 * 60 * 60 * 1000,             
     path: "/",
 };
 
@@ -19,7 +19,7 @@ const setTokenCookie = (res, userId) => {
     return token;
 };
 
-// POST /api/auth/register
+
 export const register = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -55,7 +55,7 @@ export const register = async (req, res) => {
     }
 };
 
-// POST /api/auth/login
+
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -87,16 +87,14 @@ export const login = async (req, res) => {
     }
 };
 
-// POST /api/auth/logout
 export const logout = (_req, res) => {
     res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: 0 });
     return res.status(200).json({ message: "Logged out successfully" });
 };
 
-// GET /api/auth/me
 export const getMe = async (req, res) => {
     try {
-        const user = req.user; // set by protect middleware
+        const user = req.user; 
         return res.status(200).json({
             _id: user._id,
             username: user.username,

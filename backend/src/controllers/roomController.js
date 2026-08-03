@@ -2,10 +2,9 @@ import { nanoid } from "nanoid";
 import Room from "../models/roomModel.js";
 import RoomMember from "../models/roomMember.js";
 
-// Generate a short unique room code
+
 const generateRoomCode = () => nanoid(8).toUpperCase();
 
-// POST /api/rooms/create
 export const createRoom = async (req, res) => {
     try {
         const { name, youtubeVideoId } = req.body;
@@ -14,7 +13,7 @@ export const createRoom = async (req, res) => {
             return res.status(400).json({ message: "Room name is required" });
         }
 
-        // Ensure unique room code
+   
         let roomCode;
         let exists = true;
         while (exists) {
@@ -29,7 +28,7 @@ export const createRoom = async (req, res) => {
             youtubeVideoId: youtubeVideoId || "",
         });
 
-        // Add host as a room member
+     
         await RoomMember.create({
             roomId: room._id,
             userId: req.user._id,
@@ -51,7 +50,7 @@ export const createRoom = async (req, res) => {
     }
 };
 
-// GET /api/rooms/:roomCode
+
 export const getRoomByCode = async (req, res) => {
     try {
         const { roomCode } = req.params;
@@ -61,7 +60,6 @@ export const getRoomByCode = async (req, res) => {
             return res.status(404).json({ message: "Room not found" });
         }
 
-        // Get all members with their user info
         const members = await RoomMember.find({ roomId: room._id }).populate(
             "userId",
             "username email"
@@ -88,7 +86,7 @@ export const getRoomByCode = async (req, res) => {
     }
 };
 
-// GET /api/rooms/my-rooms
+
 export const getMyRooms = async (req, res) => {
     try {
         const memberships = await RoomMember.find({ userId: req.user._id }).populate("roomId");
@@ -110,7 +108,6 @@ export const getMyRooms = async (req, res) => {
     }
 };
 
-// DELETE /api/rooms/:roomCode  (host only)
 export const closeRoom = async (req, res) => {
     try {
         const { roomCode } = req.params;

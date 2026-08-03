@@ -8,7 +8,7 @@ import { login } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../components/ui/Spinner";
 
-// Decorative feature pills shown on the left panel
+
 const PILLS = [
   { icon: <SiYoutube />, label: "YouTube sync", color: "#ff2222" },
   { icon: <MdOutlineSyncAlt />, label: "< 50ms latency", color: "#22d3ee" },
@@ -16,7 +16,7 @@ const PILLS = [
   { icon: "💬", label: "Live chat", color: "#9b59f5" },
 ];
 
-// Floating decorative orbs that respond to mouse
+
 function ParallaxOrbs({ containerRef }) {
   const [pos, setPos] = useState({ x: 0, y: 0 });
 
@@ -104,7 +104,7 @@ export default function LoginPage() {
       className="min-h-screen flex overflow-hidden"
       style={{ background: "var(--bg-base)" }}
     >
-      {/* ── LEFT PANEL (hidden on small screens) ───────────────────────────────── */}
+     
       <div
         className="hidden lg:flex lg:w-[52%] relative flex-col justify-between p-12 overflow-hidden"
         style={{ background: "linear-gradient(145deg, #0c0c0c 0%, #100808 60%, #130a0a 100%)" }}

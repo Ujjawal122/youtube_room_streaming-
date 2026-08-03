@@ -1,27 +1,26 @@
 import mongoose from "mongoose";
 
-const roomMemberSchema = mongoose.Schema(  // fixed: was "rommMemberSchema"
+const roomMemberSchema = mongoose.Schema( 
     {
         roomId: {
-            type: mongoose.Schema.Types.ObjectId, // fixed: was String
+            type: mongoose.Schema.Types.ObjectId,
             ref: "Room",
             required: true,
         },
         userId: {
-            type: mongoose.Schema.Types.ObjectId, // fixed: was String
+            type: mongoose.Schema.Types.ObjectId, 
             ref: "User",
             required: true,
         },
         role: {
             type: String,
             enum: ["host", "moderator", "participant", "viewer"],
-            default: "participant", // fixed: was "viewer" — joiners should default to participant
+            default: "participant", 
         },
     },
-    { timestamps: true } // createdAt serves as joinedAt; removed redundant joinedAt field
+    { timestamps: true } 
 );
 
-// Prevent duplicate memberships (one user per room)
 roomMemberSchema.index({ roomId: 1, userId: 1 }, { unique: true });
 
 const RoomMember = mongoose.model("RoomMember", roomMemberSchema);

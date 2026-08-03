@@ -2,19 +2,18 @@ import RoomChat from "../models/roomChat.js";
 import Room from "../models/roomModel.js";
 import RoomMember from "../models/roomMember.js";
 
-// GET /api/chat/:roomCode?limit=50&before=<messageId>
 export const getChatHistory = async (req, res) => {
     try {
         const { roomCode } = req.params;
         const limit = parseInt(req.query.limit) || 50;
-        const before = req.query.before; // cursor-based pagination
+        const before = req.query.before;
 
         const room = await Room.findOne({ roomCode: roomCode.toUpperCase(), isActive: true });
         if (!room) {
             return res.status(404).json({ message: "Room not found" });
         }
 
-        // Only members can read chat
+    
         const membership = await RoomMember.findOne({
             roomId: room._id,
             userId: req.user._id,

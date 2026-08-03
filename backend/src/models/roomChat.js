@@ -3,12 +3,12 @@ import mongoose from "mongoose";
 const messageSchema = mongoose.Schema(
     {
         roomId: {
-            type: mongoose.Schema.Types.ObjectId, // fixed: was String
+            type: mongoose.Schema.Types.ObjectId, 
             ref: "Room",
             required: true,
         },
         senderId: {
-            type: mongoose.Schema.Types.ObjectId, // fixed: was String
+            type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
@@ -22,7 +22,6 @@ const messageSchema = mongoose.Schema(
     { timestamps: true }
 );
 
-// Index for efficient chat history fetching per room
 messageSchema.index({ roomId: 1, createdAt: -1 });
 
 const RoomChat = mongoose.model("RoomChat", messageSchema);

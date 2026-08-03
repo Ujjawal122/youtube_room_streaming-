@@ -4,31 +4,20 @@ import RoomChat from "../../models/roomChat.js";
 import { RoomManager } from "./RoomManager.js";
 import { Participant } from "./Participant.js";
 
-// Valid emoji reactions
+
 const VALID_REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🔥", "👏", "🎉"];
 
-/**
- * MessageHandler
- *
- * Wires up all Socket.IO event listeners for a single connected socket.
- * Delegates state mutations to RoomManager and Participant.
- *
- * One instance per socket connection.
- */
+
 export class MessageHandler {
-    /**
-     * @param {import("socket.io").Socket} socket
-     * @param {import("socket.io").Server} io
-     * @param {Map<string, RoomManager>}   rooms  - shared registry of live RoomManagers
-     */
+  
     constructor(socket, io, rooms) {
         this.socket = socket;
         this.io = io;
         this.rooms = rooms;
-        this.user = socket.user; // set by auth middleware
+        this.user = socket.user; 
     }
 
-    /** Register all event listeners on the socket */
+   
     register() {
         const s = this.socket;
 
@@ -47,7 +36,6 @@ export class MessageHandler {
         s.on("disconnect", () => this._onDisconnect());
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────────
 
     _emit(event, payload) {
         this.socket.emit(event, payload);
@@ -60,26 +48,19 @@ export class MessageHandler {
     _userId() { return this.user._id.toString(); }
     _username() { return this.user.username; }
 
-    /**
-     * Get the RoomManager for a roomId.
-     * @param {string} roomId
-     * @returns {RoomManager|null}
-     */
+   
     _getRoom(roomId) {
         return this.rooms.get(roomId) || null;
     }
 
-    /**
-     * Get the caller's Participant object from a RoomManager.
-     * Emits error and returns null if not found.
-     */
+   
     _getSelfParticipant(room) {
         const p = room.getParticipant(this._userId());
         if (!p) { this._error("You are not in this room"); return null; }
         return p;
     }
 
-    // ── join_room ────────────────────────────────────────────────────────────────
+   
 
     async _onJoinRoom({ roomCode }) {
         try {
@@ -93,7 +74,6 @@ export class MessageHandler {
 
             const roomId = room._id.toString();
 
-            // Upsert DB membership
             let membership = await RoomMember.findOne({
                 roomId: room._id,
                 userId: this.user._id,
@@ -106,10 +86,10 @@ export class MessageHandler {
                 });
             }
 
-            // Get or create RoomManager
+       
             let mgr = this.rooms.get(roomId);
             if (!mgr) {
-                // Load state from Redis cache or DB
+              
                 const state = await RoomManager.loadState(roomId);
                 mgr = new RoomManager({
                     roomId,
@@ -124,7 +104,7 @@ export class MessageHandler {
                 this.rooms.set(roomId, mgr);
             }
 
-            // Create Participant and register in manager
+           
             const participant = new Participant({
                 userId: this._userId(),
                 username: this._username(),
@@ -133,13 +113,13 @@ export class MessageHandler {
             });
             mgr.addParticipant(participant);
 
-            // Join socket room + store reference
+      
             this.socket.join(roomId);
             this.socket.currentRoomId = roomId;
 
             const participants = await mgr.buildParticipantList();
 
-            // Send full state to joiner
+         
             this._emit("room_state", {
                 roomId,
                 roomCode: room.roomCode,
@@ -150,7 +130,6 @@ export class MessageHandler {
                 ...mgr.videoStateSnapshot(),
             });
 
-            // Notify everyone else
             mgr.broadcastExcept(this.socket.id, "user_joined", {
                 userId: this._userId(),
                 username: this._username(),
@@ -165,8 +144,7 @@ export class MessageHandler {
         }
     }
 
-    // ── leave_room ───────────────────────────────────────────────────────────────
-
+   
     async _onLeaveRoom({ roomId }) {
         await this._leaveRoom(roomId);
     }
@@ -186,14 +164,14 @@ export class MessageHandler {
                 participants,
             });
 
-            // Destroy manager when no one is online
+       
             if (mgr.isEmpty()) this.rooms.delete(roomId);
         } catch (err) {
             console.error("[leaveRoom]", err.message);
         }
     }
 
-    // ── play ─────────────────────────────────────────────────────────────────────
+   
 
     async _onPlay({ roomId }) {
         try {
@@ -202,14 +180,14 @@ export class MessageHandler {
             if (!self.canControl()) return this._error("Only host/moderator can control playback");
 
             await mgr.applyVideoState({ playbackState: "playing" });
-            // Always broadcast the FULL state so every client has all three fields
+         
             mgr.broadcast("sync_state", mgr.videoStateSnapshot());
         } catch (err) {
             this._error("Failed to broadcast play");
         }
     }
 
-    // ── pause ─────────────────────────────────────────────────────────────────────
+  
 
     async _onPause({ roomId }) {
         try {
@@ -224,7 +202,7 @@ export class MessageHandler {
         }
     }
 
-    // ── seek ──────────────────────────────────────────────────────────────────────
+ 
 
     async _onSeek({ roomId, time }) {
         try {
@@ -241,7 +219,7 @@ export class MessageHandler {
         }
     }
 
-    // ── change_video ──────────────────────────────────────────────────────────────
+   
 
     async _onChangeVideo({ roomId, videoId }) {
         try {
@@ -258,7 +236,7 @@ export class MessageHandler {
         }
     }
 
-    // ── assign_role ───────────────────────────────────────────────────────────────
+   
 
     async _onAssignRole({ roomId, targetUserId, role }) {
         try {
@@ -271,7 +249,7 @@ export class MessageHandler {
             if (!self.isHost()) return this._error("Only the host can assign roles");
             if (mgr.hostId === targetUserId) return this._error("Cannot change the host's role");
 
-            // Update in-memory if target is online
+       
             const target = mgr.getParticipant(targetUserId);
             if (target) target.setRole(role);
 
@@ -297,7 +275,6 @@ export class MessageHandler {
         }
     }
 
-    // ── remove_participant ────────────────────────────────────────────────────────
 
     async _onRemoveParticipant({ roomId, targetUserId }) {
         try {
@@ -306,14 +283,14 @@ export class MessageHandler {
             if (!self.isHost()) return this._error("Only the host can remove participants");
             if (mgr.hostId === targetUserId) return this._error("Cannot remove the host");
 
-            // Remove from DB
+       
             const deleted = await RoomMember.findOneAndDelete({
                 roomId,
                 userId: targetUserId,
             }).populate("userId", "username");
             if (!deleted) return this._error("User is not in this room");
 
-            // Force-disconnect target socket
+      
             const targetParticipant = mgr.getParticipant(targetUserId);
             if (targetParticipant) {
                 const targetSocket = this.io.sockets.sockets.get(targetParticipant.socketId);
@@ -338,8 +315,7 @@ export class MessageHandler {
         }
     }
 
-    // ── transfer_host ─────────────────────────────────────────────────────────────
-
+  
     async _onTransferHost({ roomId, targetUserId }) {
         try {
             const mgr = this._getRoom(roomId); if (!mgr) return this._error("Room not found");
@@ -366,8 +342,6 @@ export class MessageHandler {
         }
     }
 
-    // ── send_chat ─────────────────────────────────────────────────────────────────
-
     async _onSendChat({ roomId, message }) {
         try {
             if (!message || message.trim().length === 0)
@@ -375,7 +349,6 @@ export class MessageHandler {
             if (message.length > 500)
                 return this._error("Message too long (max 500 chars)");
 
-            // Must be a DB member
             const membership = await RoomMember.findOne({
                 roomId,
                 userId: this.user._id,
@@ -403,7 +376,7 @@ export class MessageHandler {
         }
     }
 
-    // ── send_reaction ─────────────────────────────────────────────────────────────
+   
 
     async _onSendReaction({ roomId, emoji }) {
         try {
@@ -416,7 +389,6 @@ export class MessageHandler {
             const self = this._getSelfParticipant(mgr);
             if (!self) return;
 
-            // Reactions are ephemeral — broadcast only, no DB save
             mgr.broadcast("new_reaction", {
                 userId: this._userId(),
                 username: this._username(),
@@ -428,16 +400,15 @@ export class MessageHandler {
         }
     }
 
-    // ── request_control ───────────────────────────────────────────────────────────
+   
 
     async _onRequestControl({ roomId }) {
         try {
             const mgr = this._getRoom(roomId); if (!mgr) return this._error("Room not found");
             const self = this._getSelfParticipant(mgr); if (!self) return;
 
-            if (self.canControl()) return; // Already has control
-
-            // Notify everyone (frontend handles only host seeing it)
+            if (self.canControl()) return; 
+           
             mgr.broadcast("control_requested", {
                 userId: this._userId(),
                 username: this._username(),
@@ -447,8 +418,7 @@ export class MessageHandler {
         }
     }
 
-    // ── disconnect ────────────────────────────────────────────────────────────────
-
+   
     async _onDisconnect() {
         console.log(`[Socket] Disconnected: ${this._username()} (${this.socket.id})`);
         if (this.socket.currentRoomId) {

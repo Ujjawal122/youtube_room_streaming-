@@ -8,7 +8,7 @@ export default function ReactionOverlay() {
         <div className="pointer-events-none absolute inset-0 overflow-hidden z-20">
             <AnimatePresence>
                 {reactions.map((r) => {
-                    // Random horizontal position per reaction
+                  
                     const left = 10 + Math.random() * 80;
                     return (
                         <motion.div

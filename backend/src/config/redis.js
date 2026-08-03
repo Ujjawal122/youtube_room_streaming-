@@ -1,7 +1,5 @@
 import Redis from "ioredis";
 
-// ─── Two separate clients required by Socket.IO Redis Adapter ────────────────
-// (pub and sub must be separate connections per ioredis docs)
 
 let pubClient = null;
 let subClient = null;
@@ -14,7 +12,7 @@ export const createRedisClients = () => {
     }
 
     pubClient = new Redis(url, {
-        maxRetriesPerRequest: null, // required for blocking commands
+        maxRetriesPerRequest: null, 
         enableReadyCheck: false,
         lazyConnect: false,
     });
@@ -29,10 +27,7 @@ export const createRedisClients = () => {
     return { pubClient, subClient };
 };
 
-/**
- * Get the pub client (general cache operations).
- * Call createRedisClients() in server.js before using this.
- */
+
 export const getRedisClient = () => {
     if (!pubClient) throw new Error("Redis not initialised — call createRedisClients() first");
     return pubClient;

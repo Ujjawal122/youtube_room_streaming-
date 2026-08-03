@@ -33,7 +33,7 @@ function RequestControlButton() {
   const handleRequest = () => {
     emitRequestControl();
     setRequested(true);
-    // Optionally reset state after a while, or keep it true until role updates
+  
     setTimeout(() => setRequested(false), 30000); 
   };
 
@@ -98,13 +98,13 @@ export default function VideoControls({ canControl }) {
     else emitPlay();
   };
 
-  // Preview the extracted video ID from what user typed
+
   const previewId = urlInput.trim() ? extractVideoId(urlInput) : "";
 
   return (
     <div className="flex flex-col gap-4">
 
-      {/* ── Row 1: Play/Pause + video info + change button ─────────────────── */}
+  
       <div className="flex items-center gap-4 flex-wrap">
 
         {/* Circular Play/Pause button */}
@@ -125,7 +125,7 @@ export default function VideoControls({ canControl }) {
               transition: "background 0.2s ease, box-shadow 0.2s ease",
             }}
           >
-            {/* Click ripples */}
+     
             {ripples.map((r) => (
               <span
                 key={r.id}
@@ -201,7 +201,7 @@ export default function VideoControls({ canControl }) {
           </a>
         )}
 
-        {/* Change video button — only for host/mod */}
+      
         {canControl && (
           <motion.button
             onClick={handleToggleInput}
@@ -224,7 +224,7 @@ export default function VideoControls({ canControl }) {
         )}
       </div>
 
-      {/* ── Row 2: URL paste panel (animated slide-down) ───────────────────── */}
+   
       <AnimatePresence>
         {showInput && canControl && (
           <motion.div
@@ -256,7 +256,7 @@ export default function VideoControls({ canControl }) {
                 </span>
               </div>
 
-              {/* Input + submit */}
+       
               <form onSubmit={handleChangeVideo} className="flex gap-2">
                 <div className="relative flex-1">
                   <input
@@ -270,7 +270,7 @@ export default function VideoControls({ canControl }) {
                       boxShadow: inputError ? "0 0 0 3px rgba(255,34,34,0.09)" : undefined,
                     }}
                   />
-                  {/* Live preview of extracted ID */}
+                
                   {previewId && !inputError && (
                     <span
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono px-2 py-0.5 rounded-lg"

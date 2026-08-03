@@ -45,12 +45,9 @@ const ROLE_MATRIX = [
 
 const TICKER_ITEMS = [
   "⚡ < 50ms real-time sync",
-  "🎬 YouTube IFrame API",
   "👥 50+ users per room",
-  "🔒 JWT httpOnly cookie auth",
   "💬 Persistent chat history",
   "😂 Emoji reaction overlay",
-  "🔁 Redis-backed scaling",
   "🎭 4 role types",
 ];
 
@@ -186,7 +183,7 @@ function RoomCard({ room, onClick, onDelete, i }) {
   );
 }
 
-// ── Main Component ─────────────────────────────────────────────────────────────
+
 
 export default function DashboardPage() {
   const { user, logoutUser } = useAuth();
@@ -253,14 +250,12 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen" style={{ background: "var(--bg-base)", color: "var(--text-1)" }}>
 
-      {/* ── Ambient glows ─────────────────────────────────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
         <div className="absolute" style={{ width: 700, height: 700, top: "-15%", left: "-15%", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,34,34,0.05) 0%, transparent 65%)", filter: "blur(60px)" }} />
         <div className="absolute" style={{ width: 500, height: 500, top: "40%", right: "-12%", borderRadius: "50%", background: "radial-gradient(circle, rgba(155,89,245,0.04) 0%, transparent 65%)", filter: "blur(60px)" }} />
         <div className="absolute" style={{ width: 400, height: 400, bottom: "0%", left: "30%", borderRadius: "50%", background: "radial-gradient(circle, rgba(34,211,238,0.03) 0%, transparent 65%)", filter: "blur(60px)" }} />
       </div>
 
-      {/* ── Navbar ────────────────────────────────────────────────────────────── */}
       <motion.nav
         ref={navRef}
         className="sticky top-0 z-30"
@@ -348,7 +343,6 @@ export default function DashboardPage() {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 relative" style={{ zIndex: 1 }}>
 
-        {/* ══ HERO ══════════════════════════════════════════════════════════════ */}
         <section className="pt-16 pb-12 text-center">
 
 
@@ -462,7 +456,7 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* ══ HOW IT WORKS ══════════════════════════════════════════════════════ */}
+     
         <section className="mb-20">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -506,7 +500,7 @@ export default function DashboardPage() {
         </section>
 
 
-        {/* ══ MY ROOMS ══════════════════════════════════════════════════════════ */}
+       
         <section className="mb-20">
           <div className="flex items-center justify-between mb-7">
             <div className="flex items-center gap-3">
@@ -577,7 +571,7 @@ export default function DashboardPage() {
             </div>
             <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, color: "var(--text-3)" }}>WatchParty</span>
           </div>
-          <p style={{ fontSize: 12, color: "var(--text-4)" }}>Built with React · Node.js · Socket.IO · MongoDB · Redis</p>
+          <p style={{ fontSize: 12, color: "var(--text-4)" }}>Built by Ujjawal Kaushal</p>
         </footer>
       </main>
 

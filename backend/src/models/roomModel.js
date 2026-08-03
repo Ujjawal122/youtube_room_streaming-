@@ -13,13 +13,13 @@ const roomSchema = mongoose.Schema(
             unique: true,
         },
         hostId: {
-            type: mongoose.Schema.Types.ObjectId, // fixed: was String
+            type: mongoose.Schema.Types.ObjectId, 
             ref: "User",
             required: true,
         },
         youtubeVideoId: {
             type: String,
-            default: "",                           // fixed: removed required:true (conflicts with default)
+            default: "",                           
         },
         currentTime: {
             type: Number,

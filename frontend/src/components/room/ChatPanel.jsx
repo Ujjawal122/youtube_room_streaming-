@@ -167,7 +167,6 @@ export default function ChatPanel() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Reaction picker */}
       <AnimatePresence>
         {showReactions && (
           <motion.div
@@ -193,13 +192,13 @@ export default function ChatPanel() {
         )}
       </AnimatePresence>
 
-      {/* Input area */}
+   
       <form
         onSubmit={handleSend}
         className="flex items-end gap-2 p-3"
         style={{ borderTop: "1px solid var(--border-2)" }}
       >
-        {/* Emoji toggle */}
+    
         <button
           type="button"
           onClick={() => setShowReactions((v) => !v)}
@@ -213,7 +212,7 @@ export default function ChatPanel() {
           😊
         </button>
 
-        {/* Textarea */}
+   
         <div className="flex-1 relative">
           <textarea
             ref={textareaRef}

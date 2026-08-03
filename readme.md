@@ -38,7 +38,7 @@ npm install
 Create a `.env` file in the **backend** directory with the following (adjust ports and URIs as needed):
 
 ```env
-PORT=5000
+PORT=3001
 MONGODB_URI=mongodb://localhost:27017/watchparty
 JWT_SECRET=your_super_secret_key
 REDIS_URL=redis://localhost:6379
