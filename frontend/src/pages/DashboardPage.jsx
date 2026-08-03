@@ -11,7 +11,7 @@ import {
   MdOutlineAdminPanelSettings, MdOutlineVideoLibrary,
 } from "react-icons/md";
 import { SiYoutube } from "react-icons/si";
-import { createRoom, getMyRooms } from "../lib/api";
+import { createRoom, getMyRooms, closeRoom } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/ui/Toast";
 import Spinner from "../components/ui/Spinner";
@@ -107,9 +107,10 @@ function FeatureCard({ f, i }) {
   );
 }
 
-function RoomCard({ room, onClick, i }) {
+function RoomCard({ room, onClick, onDelete, i }) {
   const badge = ROLE_BADGE[room.role] || ROLE_BADGE.viewer;
   const [hovered, setHovered] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   return (
     <motion.button
@@ -139,12 +140,29 @@ function RoomCard({ room, onClick, i }) {
         >
           <FiVideo className="text-lg" />
         </div>
-        <span
-          className="text-xs px-2.5 py-1 rounded-full font-semibold"
-          style={{ color: badge.color, background: badge.bg, border: `1px solid ${badge.border}`, fontFamily: "var(--font-display)" }}
-        >
-          {room.role}
-        </span>
+        <div className="flex items-center gap-2">
+          {room.role === "host" && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                setDeleting(true);
+                await onDelete(room.roomCode);
+                setDeleting(false);
+              }}
+              disabled={deleting}
+              className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+              title="Delete Room"
+            >
+              {deleting ? <Spinner size={3} /> : <FiX />}
+            </button>
+          )}
+          <span
+            className="text-xs px-2.5 py-1 rounded-full font-semibold"
+            style={{ color: badge.color, background: badge.bg, border: `1px solid ${badge.border}`, fontFamily: "var(--font-display)" }}
+          >
+            {room.role}
+          </span>
+        </div>
       </div>
 
       <p style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--text-1)", marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -195,6 +213,16 @@ export default function DashboardPage() {
       .catch(() => toast("Failed to load rooms", "error"))
       .finally(() => setLoadingRooms(false));
   }, []);
+
+  const handleDeleteRoom = async (roomCode) => {
+    try {
+      await closeRoom(roomCode);
+      setRooms((prev) => prev.filter((r) => r.roomCode !== roomCode));
+      toast("Room deleted successfully", "success");
+    } catch (err) {
+      toast(err.response?.data?.message || "Failed to delete room", "error");
+    }
+  };
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -534,7 +562,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <AnimatePresence>
                 {rooms.map((room, i) => (
-                  <RoomCard key={room._id} room={room} i={i} onClick={() => navigate(`/room/${room.roomCode}`)} />
+                  <RoomCard key={room._id} room={room} i={i} onClick={() => navigate(`/room/${room.roomCode}`)} onDelete={handleDeleteRoom} />
                 ))}
               </AnimatePresence>
             </div>
